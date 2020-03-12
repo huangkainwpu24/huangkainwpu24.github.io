@@ -1,24 +1,19 @@
 ---
 layout: post
-title:  "前端如何写一个精确的倒计时"
-categories: JavaScript
-tags:  countdown JavaScript
-author: HyG
+title:  "如何设计多标签小样本学习数据集"
+categories: few-shot learning
+tags:  multi-label classification few-shot learning
+author: 千暮云兮
 ---
 
 * content
 {:toc}
 
-关于写倒计时大家可能都都比较熟悉，使用 setTimeout 或 setInterval 就可以搞定。几秒钟或者几分钟的倒计时这样写没有问题，但是如果是长时间的倒计时，这样写就会不准确。如果用户修改了他的设备时间，这样的倒计时就没有意义了。今天就说说写一个精确的倒计时的方法。
+本篇博客将介绍关于小样本学习中多标签图像分类的一种定义，以及根据该定义如何在COCO数据集中提取出多标签小样本学习数据集。
 
-![](https://img.alicdn.com/tfs/TB18QnlOpXXXXcVXpXXXXXXXXXX-388-256.png)
-
-
-
-
-## 原理
-
-众所周知 setTimeout 或者 setInterval 调用的时候会有微小的误差。有人做了一个 [demo](https://bl.ocks.org/kenpenn/raw/92ebaa71696b4c4c3acd672b1bb3f49a/) 来观察这个现象并对其做了修正。短时间的误差倒也可以接受，但是作为一个长时间的倒计时，误差累计就会导致倒计时不准确。
+## 绪论
+小样本学习（或类似）这一概念已经提出很长时间，但在初期由于定义不明确以及基于小样本学习的图像处理任务的不统一，使得其并没有
+引起学界的关注。但2016年的Matching Networks (NIPS2016)首先对基于小样本学习的图像分类任务进行了明确定义并给出了一种基于eposide的训练方式成功的给该任务定下了benchmark，其主要是将每个batch的数据将分成support set和query set，通过support set和样本和标签给query set中样本进行标签的预测。自此两年间不断有新的小样本分类模型被提出，而在小样本分类标准数据集（Omniglot, mini-ImageNet, tiered-ImageNet等）上的识别精度也在不断的提高。
 
 因此我们可以在获取剩余时间的时候，每次 new 一个设备时间，因为设备时间的流逝相对是准确的，并且如果设备打开了网络时间同步，也会解决这个问题。
 
