@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "2020ICLR噪声标签论文解读--DivideMix: Learning With Noisy Labels as Semi-supervised Learning"
+title: "2020ICLR噪声标签论文解读--DivideMix: Learning With Noisy Labels as /Semi-supervised Learning"
 categories: 噪声标签
 tags: 噪声标签 半监督学习
 author: 千暮云兮
