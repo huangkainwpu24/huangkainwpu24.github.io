@@ -24,10 +24,13 @@ published: true
 
 2）在MixMatch模型基础上，增加了协同微调 (co-refinement) 和协同预测 (co-guessing) 。协同微调是针对于网络预测为干净标签样本的数据，利用网络的输出对该干净标签 (ground-truth labels) 进行微调（相当于为干净标签也增加了不确定性，有利于网络的鲁棒训练），而协同的含义在于预测网络处理的数据集为另一个网络在上轮迭代中划分的数据集。协同预测是针对网络预测为噪声标签样本（无标签样本），使用两个网络预测的综合来替换原来的标签。
 
-```matlab
+```
 注: 验证性偏误 (confirmation bias) 的意思是当使用模型本身划分的数据集来训练模型时，数据集划分的错误之处很可能会被模型忽略掉，且模型会不断去拟合这些错误。具体详见 Antti Tarvainen and Harri Valpola. Mean teachers are better role models: Weight-averaged consistency targets improve semi-supervised deep learning results. In NIPS, pp. 1195–1204, 2017.
 ```
 
+## 整体思路
+
+![avatar](https://i.loli.net/2020/03/13/VvpwM4lEzoT9RDj.png)
 因此我们可以在获取剩余时间的时候，每次 new 一个设备时间，因为设备时间的流逝相对是准确的，并且如果设备打开了网络时间同步，也会解决这个问题。
 
 但是，如果用户修改了设备时间，那么整个倒计时就没有意义了，用户只要将设备时间修改为倒计时的 endTime 就可以轻易看到倒计时结束是页面的变化。因此一开始获取服务端时间就是很重要的。
