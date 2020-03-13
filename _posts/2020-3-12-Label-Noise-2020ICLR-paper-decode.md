@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "论文解读--DivideMix: Learning With Noisy Labels as /Semi-supervised Learning"
+title: "论文解读--DivideMix: Learning With Noisy Labels as Semi-supervised Learning"
 categories: 噪声标签
 tags: 噪声标签 半监督学习 ICLR2020
 author: 千暮云兮
@@ -18,7 +18,7 @@ published: true
 
 3）重新对数据集的标签进行规划，将数据集分为干净数据和未标记的噪声数据，利用半监督学习的方法进行模型的训练；而该文章是属于第三种方法。
 
-## 主要贡献
+## 1 主要贡献
 
 1）使用高斯混合模型 (Gaussian Mixture Model) 拟合每个样本的损失分布，并以此将数据集样本划分为有标签样本（对应于干净标签样本）和无标签样本（对应于噪声标签样本）。为了减少验证性偏误 (confirmation bias) 文章采用两个独立的网络交替处理划分的数据集，即网络1划分的数据集由网络2处理，反之亦如此。
 
@@ -28,9 +28,18 @@ published: true
 注: 验证性偏误 (confirmation bias) 的意思是当使用模型本身划分的数据集来训练模型时，数据集划分的错误之处很可能会被模型忽略掉，且模型会不断去拟合这些错误。具体详见 Antti Tarvainen and Harri Valpola. Mean teachers are better role models: Weight-averaged consistency targets improve semi-supervised deep learning results. In NIPS, pp. 1195–1204, 2017.
 ```
 
-## 整体思路
+## 2 整体思路
 
-![avatar](https://i.loli.net/2020/03/13/VvpwM4lEzoT9RDj.png)
+DivideMix模型主要是通过构建两个同构不同参的网络，利用网络的预测输出对数据集进行标记集（干净标签样本集）和未标记集（噪声标签样本集）进行划分，然后各自网络针对另一个网络划分的数据集进行优化，具体模型示意图如图1所示。首先，每个epoch内含有多个mini-batch，而每个epoch间会存在一个co-divide过程。co-divide就是对数据集进行划分的过程，具体的操作过程下文将详细介绍。在每个epoch中A和B网络各自接收来自对方划分的数据集进行训练，而在每个mini-batch之间各自的数据集内标签将会根据网络的输出进行调整（MixMatch过程）。下面，将对模型两个关键点Co-Divide和MixMatch进行详细说明。
+
+![avatar](https://i.loli.net/2020/03/13/VvpwM4lEzoT9RDj.png) <center>**图1.** DivideMix整体模型示意图</center></div>
+
+## 3 关键技术
+
+### 3.1 Co-DivideMix
+
+首先需要知道深度网络的一个特性：即在训练过程中会优先学习干净标签样本（噪声标签处理三种主流方法的第一种就是利用这一特性）。而反应在交叉熵损失函数值上就是对于干净标签样本损失值都较小，对于噪声标签样本网络的损失值较大。对于干净标签样本损失值的集合便可以看成是一个分布，这个分布理想情况下均值应该为0（但实际肯定是大于0），实际上分布可以类似成一个正态分布（个人觉得应该是均值为0的右半边正态分布）。同理，独眼噪声标签样本损失值的集合也是可以类似于一个正态分布，而这个正态分布的均值和方差未知（与网络参数有关）。
+
 因此我们可以在获取剩余时间的时候，每次 new 一个设备时间，因为设备时间的流逝相对是准确的，并且如果设备打开了网络时间同步，也会解决这个问题。
 
 但是，如果用户修改了设备时间，那么整个倒计时就没有意义了，用户只要将设备时间修改为倒计时的 endTime 就可以轻易看到倒计时结束是页面的变化。因此一开始获取服务端时间就是很重要的。
