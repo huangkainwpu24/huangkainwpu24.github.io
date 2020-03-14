@@ -1,10 +1,14 @@
 ---
 layout: post
 title: "论文解读--DivideMix: Learning With Noisy Labels as Semi-supervised Learning"
-categories: 噪声标签
-tags: 噪声标签 半监督学习 ICLR2020
+categories: 
+- Noisy Labels
+tags: 
+- Noisy Labels
+- Semi-supervised Learning
+- ICLR2020
 author: 千暮云兮
-published: true
+mathjax: true
 ---
 
 * content
@@ -43,9 +47,11 @@ DivideMix模型主要是通过构建两个同构不同参的网络，利用网�
 以上便是Co-DibideMix的核心思想，具体算法见图3伪代码中4-8行。大致流程为，将数据集分别输入到两个网络中，根据各自网络计算得到损失值构建GMM，继而得到样本标签干净的概率分布。然后根据阈值分别对数据集进行划分，划分的数据集将用于另一个网络的后续训练。而这一数据集划分过程在每个batch都会进行。
 
 需要注意的是，在整个算法开始开始前需要对网络进行 “warm up”（即热启动），而在本文中的热启动与一般网络的热启动还不太一样。一般网络的热启动通常是在正常训练前先使用小学习率进行训练，而该文的热训练主要利用网络优先学习干净标签样本数据的特点，在进行co-dividemix前有一个对干净标签样本数据利好的网络。但对于非均匀噪声 (asymmetric noisy)，由于该噪声是数据集中部分类别有序的被标记为另一些类别，使得相对均匀噪声而言其熵更低（均匀噪声随机性更大，噪声标签样本熵更高）。因此，存在非均匀噪声的数据集整体的交叉熵损失值都偏小（见图2a），影响网络的warm up效果。这里作者使用最常见的方法，即使用香农熵正则项进行约束。对于输入$x$而言，该正则项为：
+
 $$
 \mathcal{H}=-\sum_{c} \mathrm{p}_{\text {model }}^{\mathrm{c}}(x ; \theta) \log \left(\mathrm{p}_{\text {model }}^{\mathrm{c}}(x ; \theta)\right)
 $$
+
 在交叉熵损失基础上增加该熵正则项可以使得网络倾向输出0或者1，从而增强网络对输入样本的鉴别能力，防止输出的类别概率预测都非常接近。具体效果见图2b，可以看出两个分布的区分度相比2a图更加明显且分布更加接近正态。图2c表示的是在经过warm up后20个epoch的dividemix训练分布，最主要的变化是干净标签样本的损失更加趋近于0了，说明网络更多的在拟合干净标签样本而遗弃非干净标签样本。
 
 ![avatar](https://i.loli.net/2020/03/13/gcbzl1UwJiRQD4m.png) <center> **图2.** 在CIFAR-10中损失函数经验分布</center>
