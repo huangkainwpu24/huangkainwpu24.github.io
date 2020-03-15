@@ -58,13 +58,21 @@ $$\mathcal{H}=-\sum_{c} \mathrm{p}_{\text {model }}^{\mathrm{c}}(x ; \theta) \lo
 
 ![2](https://i.loli.net/2020/03/13/gcbzl1UwJiRQD4m.png) <center>图2. 在CIFAR-10中损失函数经验分布</center>
 
+![3](https://i.loli.net/2020/03/13/7L2oZCWrlKkzHwn.png) <center>图3. DivideMix算法伪代码</center>
+
 ### 3.2 Modified MixMatch
 
 之前提及，作者在MinMatch的基础增加了协同微调 (co-refinement) 和协同预测 (co-guessing)，那么接下来将详细介绍这两点。
 
 首先是co-refinement模块，其主要是针对标记的样本集，即将标记样本数据的ground-truth标签与网络的预测输出根据该样本属于干净标签的概率进行线性融合。
 
-假设一个mini-batch中标记的样本、对应的one-hot标签以及属于干净标签的概率用集合$\hat{\mathcal{X}} = \left\{\left(x_{b}, y_{b}, w_{b}\right) ; b \in(1, \ldots, B)\right\}$，网络对标记样本数据的类别预测输出为$p_{b}$，那么线性融合过程为：
+假设一个mini-batch中标记的样本、对应的one-hot标签以及属于干净标签的概率用集合$\hat{\mathcal{X}}$表示，其中有
+
+$$
+\hat{\mathcal{X}} = \left\{\left(x_{b}, y_{b}, w_{b}\right);b\in(1,\ldots, B)\right\}
+$$
+
+ 网络对标记样本数据的类别预测输出为$p_{b}$，那么线性融合过程为：
 
 $$
 \bar{y}_{b}=w_{b} y_{b}+\left(1-w_{b}\right) p_{b}
