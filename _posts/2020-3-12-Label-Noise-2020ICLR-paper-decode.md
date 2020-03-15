@@ -58,6 +58,47 @@ $$\mathcal{H}=-\sum_{c} \mathrm{p}_{\text {model }}^{\mathrm{c}}(x ; \theta) \lo
 
 ![2](https://i.loli.net/2020/03/13/gcbzl1UwJiRQD4m.png) <center>图2. 在CIFAR-10中损失函数经验分布</center>
 
+### 3.2 Modified MixMatch
+
+之前提及，作者在MinMatch的基础增加了协同微调 (co-refinement) 和协同预测 (co-guessing)，那么接下来将详细介绍这两点。
+
+首先是co-refinement模块，其主要是针对标记的样本集，即将标记样本数据的ground-truth标签与网络的预测输出根据该样本属于干净标签的概率进行线性融合。
+
+假设一个mini-batch中标记的样本、对应的one-hot标签以及属于干净标签的概率用集合$\hat{\mathcal{X}} = \left\{\left(x_{b}, y_{b}, w_{b}\right) ; b \in(1, \ldots, B)\right\}$，网络对标记样本数据的类别预测输出为$p_{b}$，那么线性融合过程为：
+
+$$
+\bar{y}_{b}=w_{b} y_{b}+\left(1-w_{b}\right) p_{b}
+$$
+
+同时对线性融合的输出进行锐化（不太清楚其作用）：
+
+$$
+\hat{y}_{b}=\operatorname{Sharpen}\left(\bar{y}_{b}, T\right)={\bar{y}_{b}^{c}}^{\frac{1}{T}} / \sum_{c=1}^{C} {\bar{y}_{b}^{c}}^ \frac{1}{T}, \text { for } c=1,2, \dots, C
+$$
+
+那么最终得到的\hat{y}_{b}将作为标记样本的新标签参与后续的训练，具体伪代码片段为图3中17-19行。
+
+接下来是co-guessing模块，其主要是针对未标记的样本集，与对标记数据标签微调不同的是，未标记样本是没有ground-truth标签的，因此作者便使用两个网络的预测融合（加权平均）的结果作为未标记样本的预测标签（说到底还是尽可能利用上可以利用的信息，增强标签的鲁棒性）。这一点文章里面也是略提了一下，其实和标记样本的协同微调十分相似，只是融合过程不同，后续都经过了输出锐化。
+
+那么最后便是MixMatch部分了，MixMatch主要是研究如何将两个样本（和标签）进行融合。具体的算法内容可参见[Unsupervised label noise modeling and loss correction](https://arxiv.org/abs/1904.11238)这篇文章，这里就不对其进行详细介绍了（主要是还没看），下面是其计算过程：
+
+$$
+\begin{aligned}
+&\lambda \sim \operatorname{Beta}(\alpha, \alpha)\\
+&\lambda^{\prime}=\max (\lambda, 1-\lambda)\\
+&x^{\prime}=\lambda^{\prime} x_{1}+\left(1-\lambda^{\prime}\right) x_{2}\\
+&p^{\prime}=\lambda^{\prime} p_{1}+\left(1-\lambda^{\prime}\right) p_{2}
+\end{aligned}
+$$
+
+
+
+```
+注：模型还使用于一个叫作多重数据增强 (multiple augmentations)的技术，即对于听一个样本使用不同的图像变化及增强，如随机裁剪或随机翻转等。之后同时将这些由同一个样本不同数据增强的复样本（暂且这么命名）输入到网络中，网络对该样本的预测将是这些复样本预测的加权平均。而上述标记样本和未标记样本都会用多重数据增强的方式，大致的作用应该就是可以进一步加强网络输出的稳定性和鲁棒性。
+```
+
+假设一个mini-batch中未标记的样本用集合$\hat{\mathcal{U}} = \left\{u_{b}; b\in(1, \ldots, B)\right\}$表示，
+
 因此我们可以在获取剩余时间的时候，每次 new 一个设备时间，因为设备时间的流逝相对是准确的，并且如果设备打开了网络时间同步，也会解决这个问题。
 
 但是，如果用户修改了设备时间，那么整个倒计时就没有意义了，用户只要将设备时间修改为倒计时的 endTime 就可以轻易看到倒计时结束是页面的变化。因此一开始获取服务端时间就是很重要的。
