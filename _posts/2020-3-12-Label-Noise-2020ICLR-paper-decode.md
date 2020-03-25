@@ -156,21 +156,21 @@ $$
 在python的sklearn中，第一种方法和第二中方法对应于sklearn.metrics.roc_auc_score函数中参数average值为macro和micro的情况。
 
 ```python
-    one_hot_targets = label_binarize(all_targets.cpu().tolist(), classes=[i for i in range(args.num_class)])
-    for i in range(args.num_class):
-        fpr[i], tpr[i], _ = roc_curve(one_hot_targets[:, i], all_outputs.cpu().numpy()[:, i])
-        roc_auc[i] = auc(fpr[i], tpr[i])
+one_hot_targets = label_binarize(all_targets.cpu().tolist(), classes=[i for i in range(args.num_class)])
+for i in range(args.num_class):
+    fpr[i], tpr[i], _ = roc_curve(one_hot_targets[:, i], all_outputs.cpu().numpy()[:, i])
+    roc_auc[i] = auc(fpr[i], tpr[i])
 
-    # Compute micro-average ROC curve and ROC area (2)
-    fpr['micro'], tpr['micro'], _ = roc_curve(one_hot_targets.ravel(), all_outputs.cpu().numpy().ravel())
-    roc_auc['micro'] = auc(fpr['micro'], tpr['micro'])
-    # Compute macro-average ROC curve and ROC area (1)
-    all_fpr = np.unique(np.concatenate([fpr[i] for i in range(args.num_class)]))
-    mean_tpr = np.zeros_like(all_fpr)
-    for i in range(args.num_class):
-        mean_tpr += np.interp(all_fpr, fpr[i], tpr[i])
-    mean_tpr /= args.num_class
-    fpr['macro'] = all_fpr
-    tpr['macro'] = mean_tpr
-    roc_auc['macro'] = auc(fpr['macro'], tpr['macro'])
+# Compute micro-average ROC curve and ROC area (2)
+fpr['micro'], tpr['micro'], _ = roc_curve(one_hot_targets.ravel(), all_outputs.cpu().numpy().ravel())
+roc_auc['micro'] = auc(fpr['micro'], tpr['micro'])
+# Compute macro-average ROC curve and ROC area (1)
+all_fpr = np.unique(np.concatenate([fpr[i] for i in range(args.num_class)]))
+mean_tpr = np.zeros_like(all_fpr)
+for i in range(args.num_class):
+    mean_tpr += np.interp(all_fpr, fpr[i], tpr[i])
+mean_tpr /= args.num_class
+fpr['macro'] = all_fpr
+tpr['macro'] = mean_tpr
+roc_auc['macro'] = auc(fpr['macro'], tpr['macro'])
 ```
