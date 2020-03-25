@@ -175,4 +175,7 @@ $$
 14. roc_auc['macro'] = auc(fpr['macro'], tpr['macro'])
 ```
 
-其中，all_targets为每个batch样本对应的真实标签，all_outputs为模型对batch样本的预测输出。第1行表示将样本标签one-hot化，2-
+其中，all_targets为每个batch样本对应的真实标签，all_outputs为模型对batch样本的预测输出。第1行表示将样本标签one-hot化，2-4行为计算各类别的假阳性率、真阳性率及对应的AUC，5-6行为方法二对应的实现代码，7-14行对应于方法一。最终的结果如下：
+
+![4](https://i.loli.net/2020/03/25/Txz8wqP3IfLKF6J.png)<center>图4. 含80%均匀噪声CIFAR10数据集训练过程测试集AUC随着epoch的变化曲线</center>
+
