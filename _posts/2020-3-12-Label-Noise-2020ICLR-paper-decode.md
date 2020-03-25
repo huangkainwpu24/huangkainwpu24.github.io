@@ -153,24 +153,26 @@ $$
 
 这两个方法相比，在数据集正常的情况下两者的结果相近。但是在数据集类别不平衡的情况下，第一种方法相比第二种方法无法便无法体现出类别不平横情况下的AUC。
 
-在python的sklearn中，第一种方法和第二中方法对应于sklearn.metrics.roc_auc_score函数中参数average值为macro和micro的情况。
+在python的sklearn中，第一种方法和第二中方法对应于sklearn.metrics.roc_auc_score函数中参数average值为macro和micro的情况。下面为这两种方法应用于cifar10数据集中的代码实现部分，选用的噪声为80%的均匀噪声，对应于文章附录中图3的绿线。
 
 ```python
-one_hot_targets = label_binarize(all_targets.cpu().tolist(), classes=[i for i in range(args.num_class)])
-for i in range(args.num_class):
-    fpr[i], tpr[i], _ = roc_curve(one_hot_targets[:, i], all_outputs.cpu().numpy()[:, i])
-    roc_auc[i] = auc(fpr[i], tpr[i])
+1. one_hot_targets = label_binarize(all_targets.cpu().tolist(), classes=[i for i in range(args.num_class)])
+2. for i in range(args.num_class):
+3.     fpr[i], tpr[i], _ = roc_curve(one_hot_targets[:, i], all_outputs.cpu().numpy()[:, i])
+4.     roc_auc[i] = auc(fpr[i], tpr[i])
 
 # Compute micro-average ROC curve and ROC area (2)
-fpr['micro'], tpr['micro'], _ = roc_curve(one_hot_targets.ravel(), all_outputs.cpu().numpy().ravel())
-roc_auc['micro'] = auc(fpr['micro'], tpr['micro'])
+5. fpr['micro'], tpr['micro'], _ = roc_curve(one_hot_targets.ravel(), all_outputs.cpu().numpy().ravel())
+6. roc_auc['micro'] = auc(fpr['micro'], tpr['micro'])
 # Compute macro-average ROC curve and ROC area (1)
-all_fpr = np.unique(np.concatenate([fpr[i] for i in range(args.num_class)]))
-mean_tpr = np.zeros_like(all_fpr)
-for i in range(args.num_class):
-    mean_tpr += np.interp(all_fpr, fpr[i], tpr[i])
-mean_tpr /= args.num_class
-fpr['macro'] = all_fpr
-tpr['macro'] = mean_tpr
-roc_auc['macro'] = auc(fpr['macro'], tpr['macro'])
+7. all_fpr = np.unique(np.concatenate([fpr[i] for i in range(args.num_class)]))
+8. mean_tpr = np.zeros_like(all_fpr)
+9. for i in range(args.num_class):
+10.     mean_tpr += np.interp(all_fpr, fpr[i], tpr[i])
+11. mean_tpr /= args.num_class
+12. fpr['macro'] = all_fpr
+13. tpr['macro'] = mean_tpr
+14. roc_auc['macro'] = auc(fpr['macro'], tpr['macro'])
 ```
+
+其中，all_targets为每个batch样本对应的真实标签，all_outputs为模型对batch样本的预测输出。第1行表示将样本标签one-hot化，2-
