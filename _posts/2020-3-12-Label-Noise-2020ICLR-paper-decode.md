@@ -179,3 +179,11 @@ $$
 
 ![4](https://i.loli.net/2020/03/25/Txz8wqP3IfLKF6J.png)<center>图4. 含80%均匀噪声CIFAR10数据集训练过程测试集AUC随着epoch的变化曲线</center>
 
+<center>
+<figure>
+<img src="https://i.loli.net/2020/03/25/Txz8wqP3IfLKF6J.png" />
+
+<img src="https://i.loli.net/2020/03/25/GfShrnQ4JszLuD5.png" />
+
+</figure>
+</center>
